@@ -22,10 +22,7 @@ const get = async (url: string) => {
 
 const modulePlugin = npmModulePlugin();
 
-export async function bundle(
-  imports: ImportDefinition[],
-  onWarn?: (warn: string) => void
-) {
+export async function bundle(imports: ImportDefinition[], onWarn?: (warn: string) => void) {
   try {
     const code = createCode(imports);
     const entry = `virtual:entry`;
@@ -50,7 +47,7 @@ export async function bundle(
           size: utf8.byteLength,
           gzip: gzipBuffer.byteLength,
         }));
-      })
+      }),
     );
   } catch (e) {
     console.error("Bundling error:", e);
@@ -91,9 +88,7 @@ function npmModulePlugin(): Plugin {
       importer = importer ? unresolved(importer) : undefined;
       if (importer && isHttpProtocol(importer)) {
         const url = new URL(importer);
-        const resolvedPath = id.startsWith("/")
-          ? id
-          : path.join(path.dirname(url.pathname), id);
+        const resolvedPath = id.startsWith("/") ? id : path.join(path.dirname(url.pathname), id);
         return resolved(`${url.origin}${resolvedPath}`);
       }
       if (id.startsWith("npm:")) {

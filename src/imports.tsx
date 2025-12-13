@@ -16,25 +16,19 @@ export function Imports(props: Props) {
 
   const onNamesChange = useMemo(() => {
     return debounce((id: string, value: string) => {
-      temporary.value = temporary.value.map((i) =>
-        i.id === id ? { ...i, names: value } : i
-      );
+      temporary.value = temporary.value.map((i) => (i.id === id ? { ...i, names: value } : i));
     }, 500);
   }, []);
 
   const onSpecifierChange = useMemo(() => {
     return debounce((id: string, value: string) => {
-      temporary.value = temporary.value.map((i) =>
-        i.id === id ? { ...i, specifier: value } : i
-      );
+      temporary.value = temporary.value.map((i) => (i.id === id ? { ...i, specifier: value } : i));
     }, 500);
   }, []);
 
   return (
     <section class="bg-white rounded-lg shadow-sm p-4 md:p-5 border-2 border-gray-200">
-      <h2 class="text-xl font-bold mt-0 mb-4 text-gray-800">
-        Import Statements
-      </h2>
+      <h2 class="text-xl font-bold mt-0 mb-4 text-gray-800">Import Statements</h2>
       <ul class="flex flex-col gap-3">
         {temporary.value.map((imp) => (
           <li
@@ -56,9 +50,7 @@ export function Imports(props: Props) {
                 <input
                   type="text"
                   value={imp.specifier}
-                  onInput={(ev) =>
-                    onSpecifierChange(imp.id, ev.currentTarget.value)
-                  }
+                  onInput={(ev) => onSpecifierChange(imp.id, ev.currentTarget.value)}
                   placeholder="package-name"
                   class="flex-1 px-2 py-1.5 font-mono text-sm border border-gray-200 rounded bg-white transition-all outline-none focus:border-gray-500 focus:ring-2 focus:ring-gray-200 placeholder-gray-400"
                 />
@@ -66,9 +58,7 @@ export function Imports(props: Props) {
               </div>
               <button
                 onClick={() => {
-                  temporary.value = temporary.value.filter(
-                    (i) => i.id !== imp.id
-                  );
+                  temporary.value = temporary.value.filter((i) => i.id !== imp.id);
                 }}
                 class="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 rounded text-gray-600 font-semibold cursor-pointer transition-all hover:bg-gray-100 hover:border-gray-400"
                 title="Remove import"
@@ -114,7 +104,7 @@ export function Imports(props: Props) {
 
 function debounce<Args extends any[]>(
   func: (...args: Args) => void,
-  wait: number
+  wait: number,
 ): (...args: Args) => void {
   let timeout: number | undefined;
   return (...args) => {

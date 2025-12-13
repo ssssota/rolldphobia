@@ -1,5 +1,5 @@
 name: Setup
-description: 'Sets up the environment for the workflow'
+description: "Sets up the environment for the workflow"
 
 runs:
   using: composite

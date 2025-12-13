@@ -33,7 +33,7 @@ export function Analyzer(props: Props) {
         bundle(imports, (warn) => {
           if (warn.includes(slowWarningMessage)) return;
           warns.value = [...warns.value, warn];
-        })
+        }),
       )
       .then((resultList) => {
         const endTime = performance.now();
@@ -55,26 +55,19 @@ export function Analyzer(props: Props) {
       {results.value.length > 0 ? (
         <ul class="space-y-4">
           {results.value.map((result) => (
-            <li
-              key={result.code}
-              class="p-4 bg-gray-50 border border-gray-300 rounded-md"
-            >
+            <li key={result.code} class="p-4 bg-gray-50 border border-gray-300 rounded-md">
               <dl class="flex flex-wrap gap-3 mb-3">
                 <div class="flex-1 min-w-32 p-3 bg-white border border-gray-300 rounded text-center">
                   <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
                     Bundle Size
                   </dt>
-                  <dd class="text-xl font-bold text-gray-800">
-                    {byteLengthToString(result.size)}
-                  </dd>
+                  <dd class="text-xl font-bold text-gray-800">{byteLengthToString(result.size)}</dd>
                 </div>
                 <div class="flex-1 min-w-32 p-3 bg-white border border-gray-300 rounded text-center">
                   <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
                     Gzipped
                   </dt>
-                  <dd class="text-xl font-bold text-gray-800">
-                    {byteLengthToString(result.gzip)}
-                  </dd>
+                  <dd class="text-xl font-bold text-gray-800">{byteLengthToString(result.gzip)}</dd>
                 </div>
               </dl>
               <details class="mt-3">
@@ -83,9 +76,7 @@ export function Analyzer(props: Props) {
                   <span class="text-gray-400 text-sm">▼</span>
                 </summary>
                 <pre class="m-0 p-4 bg-gray-50 border border-gray-300 border-t-0 rounded-b overflow-x-auto whitespace-pre-wrap break-words">
-                  <code class="font-mono text-sm leading-relaxed text-gray-700">
-                    {result.code}
-                  </code>
+                  <code class="font-mono text-sm leading-relaxed text-gray-700">{result.code}</code>
                 </pre>
               </details>
             </li>
