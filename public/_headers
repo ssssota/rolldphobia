@@ -1,0 +1,4 @@
+# use COEP and COOP for cross-origin isolation to enable SharedArrayBuffer
+/*
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Opener-Policy: same-origin

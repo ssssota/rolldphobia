@@ -1,0 +1,7 @@
+{
+  "name": "rolldphobia",
+  "compatibility_date": "2025-12-13",
+  "assets": {
+    "directory": "./dist"
+  }
+}
