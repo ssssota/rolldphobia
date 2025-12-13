@@ -1,0 +1,22 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+}
+
+:where(*, *::before, *::after) {
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: 0;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+dd {
+  margin: 0;
+}
