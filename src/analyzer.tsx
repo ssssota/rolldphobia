@@ -1,7 +1,7 @@
 import { type Signal, useSignal, useSignalEffect } from "@preact/signals";
 import ansis from "ansis";
 import { useRef } from "preact/hooks";
-import type { ImportDefinition } from "./types";
+import type { ImportDefinition } from "./import-definition";
 const slowWarningMessage = "[PLUGIN_TIMINGS]";
 
 type Result = {

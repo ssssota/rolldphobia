@@ -3,7 +3,7 @@ import * as path from "@std/path";
 // HACK: Importing from dist to avoid wasm url issues in the browser
 // @ts-expect-error
 import { build as buildImpl } from "../node_modules/@rolldown/browser/dist/index.browser.mjs";
-import type { ImportDefinition } from "./types";
+import type { ImportDefinition } from "./import-definition";
 const build: typeof buildType = buildImpl;
 const encoder = new TextEncoder();
 const cache = createLRUCache<string, string>(50);

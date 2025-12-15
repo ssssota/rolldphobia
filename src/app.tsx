@@ -1,7 +1,7 @@
 import { useSignal } from "@preact/signals";
 import { Analyzer } from "./analyzer";
+import type { ImportDefinition } from "./import-definition";
 import { Imports } from "./imports";
-import type { ImportDefinition } from "./types";
 
 export function App() {
   const imports = useSignal<ImportDefinition[]>();

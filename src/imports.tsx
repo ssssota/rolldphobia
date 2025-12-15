@@ -1,13 +1,13 @@
 import { useSignal, type Signal } from "@preact/signals";
 import { useMemo } from "preact/hooks";
-import type { ImportDefinition } from "./types";
+import { getImportsFromQuery, storeImportsToQuery, type ImportDefinition } from "./import-definition";
 
 interface Props {
   imports: Signal<ImportDefinition[] | undefined>;
 }
 
 export function Imports(props: Props) {
-  const temporary = useSignal([
+  const temporary = useSignal(getImportsFromQuery(window.location.search) || [
     { id: "1", specifier: "preact", names: "{ render }" },
     { id: "2", specifier: "preact/jsx-runtime", names: "{ jsx }" },
     { id: "3", specifier: "preact/hooks", names: "* as hooks" },
@@ -89,6 +89,7 @@ export function Imports(props: Props) {
         <button
           onClick={() => {
             props.imports.value = temporary.value;
+            storeImportsToQuery(temporary.value);
           }}
           class="w-full px-4 py-2 flex items-center justify-center gap-2 bg-gray-700 border border-gray-800 rounded-md text-white font-semibold cursor-pointer transition-all shadow-sm hover:bg-gray-800 hover:shadow-md active:translate-y-0"
         >
