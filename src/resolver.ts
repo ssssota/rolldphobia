@@ -8,7 +8,7 @@ const get = (url: string) => {
     console.log("Cache hit:", url);
     return cached;
   }
-  const res = fetch(url).then((r) => r.text());
+  const res = fetch(url).then((r) => r.text(), console.warn);
   cache.set(url, res);
   return res;
 };
@@ -20,7 +20,6 @@ function npmModulePlugin(): Plugin {
   return {
     name: "npm-module",
     async resolveId(id: string, importer?: string) {
-      console.log("Resolving:", { id, importer });
       if (isHttpProtocol(id)) return id;
       if (importer && isHttpProtocol(importer)) {
         if (id.startsWith(".") || id.startsWith("/")) {

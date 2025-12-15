@@ -19,6 +19,7 @@ export function Analyzer(props: Props) {
   const warns = useSignal<string[]>([]);
   const results = useSignal<Result[]>([]);
   const bundleDuration = useSignal<number | null>(null);
+  const isLoading = useSignal<boolean>(false);
   useSignalEffect(() => {
     const imports = props.imports.value;
     if (imports === undefined || imports.length === 0) {
@@ -27,6 +28,7 @@ export function Analyzer(props: Props) {
 
     warns.value = [];
     bundleDuration.value = null;
+    isLoading.value = true;
     const startTime = performance.now();
     import("./bundle")
       .then(({ bundle }) =>
@@ -36,10 +38,13 @@ export function Analyzer(props: Props) {
         }),
       )
       .then((resultList) => {
-        const endTime = performance.now();
-        bundleDuration.value = endTime - startTime;
         results.value = resultList;
         next.current?.();
+      })
+      .finally(() => {
+        const endTime = performance.now();
+        bundleDuration.value = endTime - startTime;
+        isLoading.value = false;
       });
   });
   return (
@@ -52,7 +57,15 @@ export function Analyzer(props: Props) {
           </span>
         )}
       </h2>
-      {results.value.length > 0 ? (
+      {isLoading.value ? (
+        <div class="text-center py-12">
+          <div
+            class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300/50 border-t-gray-800 blur-[.5px]"
+            aria-hidden
+          ></div>
+          <p class="mt-4 text-gray-600">Analyzing bundle...</p>
+        </div>
+      ) : results.value.length > 0 ? (
         <ul class="space-y-4">
           {results.value.map((result) => (
             <li key={result.code} class="p-4 bg-gray-50 border border-gray-300 rounded-md">
