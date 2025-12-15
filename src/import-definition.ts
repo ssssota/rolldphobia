@@ -9,18 +9,20 @@ export type ImportDefinition = {
 
 export function getImportsFromQuery(query: string): ImportDefinition[] | undefined {
   const params = new URLSearchParams(query);
+  if (!params.has("i")) {
+    return undefined;
+  }
   const imports: ImportDefinition[] = [];
   for (const value of params.getAll("i")) {
     const [specifier, ...names] = value.split("|");
-    if (specifier) {
-      imports.push({
-        id: crypto.randomUUID(),
-        specifier,
-        names: names.join("|"),
-      });
-    }
+    if (!specifier) continue;
+    imports.push({
+      id: crypto.randomUUID(),
+      specifier,
+      names: names.join("|"),
+    });
   }
-  return imports.length > 0 ? imports : undefined;
+  return imports;
 }
 export function storeImportsToQuery(imports: ImportDefinition[]): void {
   const params = new URLSearchParams(window.location.search);

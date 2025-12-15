@@ -1,18 +1,24 @@
 import { useSignal, type Signal } from "@preact/signals";
 import { useMemo } from "preact/hooks";
-import { getImportsFromQuery, storeImportsToQuery, type ImportDefinition } from "./import-definition";
+import {
+  getImportsFromQuery,
+  storeImportsToQuery,
+  type ImportDefinition,
+} from "./import-definition";
 
 interface Props {
   imports: Signal<ImportDefinition[] | undefined>;
 }
 
 export function Imports(props: Props) {
-  const temporary = useSignal(getImportsFromQuery(window.location.search) || [
-    { id: "1", specifier: "preact", names: "{ render }" },
-    { id: "2", specifier: "preact/jsx-runtime", names: "{ jsx }" },
-    { id: "3", specifier: "preact/hooks", names: "* as hooks" },
-    { id: "4", specifier: "jsr:@std/path", names: "{ join, dirname }" },
-  ]);
+  const temporary = useSignal(
+    getImportsFromQuery(window.location.search) || [
+      { id: "1", specifier: "preact", names: "{ render }" },
+      { id: "2", specifier: "preact/jsx-runtime", names: "{ jsx }" },
+      { id: "3", specifier: "preact/hooks", names: "* as hooks" },
+      { id: "4", specifier: "jsr:@std/path", names: "{ join, dirname }" },
+    ],
+  );
 
   const onNamesChange = useMemo(() => {
     return debounce((id: string, value: string) => {
