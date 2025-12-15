@@ -19,9 +19,15 @@ importers:
       ansis:
         specifier: ^4.2.0
         version: 4.2.0
+      jsonc-parser:
+        specifier: ^3.3.1
+        version: 3.3.1
       preact:
         specifier: ^10.27.2
         version: 10.28.0
+      resolve.exports:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       "@preact/preset-vite":
         specifier: ^2.10.2
@@ -1152,6 +1158,12 @@ packages:
     engines: { node: ">=6" }
     hasBin: true
 
+  jsonc-parser@3.3.1:
+    resolution:
+      {
+        integrity: sha512-HUgH65KyejrUFPvHFPbqOY0rsFip3Bo5wb4ngvdi1EpCYWUQDC5V+Y7mZws+DLkr4M//zQJoanu1SP+87Dv1oQ==,
+      }
+
   kolorist@1.8.0:
     resolution:
       {
@@ -1436,6 +1448,13 @@ packages:
         integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==,
       }
     engines: { node: ">=8.10.0" }
+
+  resolve.exports@2.0.3:
+    resolution:
+      {
+        integrity: sha512-OcXjMsGdhL4XnbShKpAcSqPMzQoYkYyhbEaeSko47MjRP9NfEQMhZkXL1DoFlt9LWQn4YttrdnV6X2OiyzBi+A==,
+      }
+    engines: { node: ">=10" }
 
   rolldown@1.0.0-beta.54:
     resolution:
@@ -2310,6 +2329,8 @@ snapshots:
 
   json5@2.2.3: {}
 
+  jsonc-parser@3.3.1: {}
+
   kolorist@1.8.0: {}
 
   lightningcss-android-arm64@1.30.2:
@@ -2458,6 +2479,8 @@ snapshots:
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
+
+  resolve.exports@2.0.3: {}
 
   rolldown@1.0.0-beta.54:
     dependencies:

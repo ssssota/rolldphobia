@@ -1,26 +1,13 @@
 import type { build as buildType, Plugin } from "@rolldown/browser";
-import * as path from "@std/path";
 // HACK: Importing from dist to avoid wasm url issues in the browser
 // @ts-expect-error
 import { build as buildImpl } from "../node_modules/@rolldown/browser/dist/index.browser.mjs";
 import type { ImportDefinition } from "./import-definition";
-const build: typeof buildType = buildImpl;
-const encoder = new TextEncoder();
-const cache = createLRUCache<string, string>(50);
-const get = async (url: string) => {
-  const cached = cache.get(url);
-  if (cached) return cached;
-  try {
-    const res = await fetch(url);
-    const text = await res.text();
-    cache.set(url, text);
-    return text;
-  } catch {
-    // noop
-  }
-};
+import { httpsPlugin, modulePlugin } from "./resolver";
 
-const modulePlugin = npmModulePlugin();
+const build: typeof buildType = buildImpl;
+
+const encoder = new TextEncoder();
 
 export async function bundle(imports: ImportDefinition[], onWarn?: (warn: string) => void) {
   try {
@@ -36,7 +23,7 @@ export async function bundle(imports: ImportDefinition[], onWarn?: (warn: string
         onWarn?.(String(log));
       },
       output: { minify: true },
-      plugins: [entryPlugin({ id: entry, code }), modulePlugin],
+      plugins: [entryPlugin({ id: entry, code }), modulePlugin, httpsPlugin],
     });
     const chunks = result.output.filter((c) => c.type === "chunk");
     return await Promise.all(
@@ -57,7 +44,7 @@ export async function bundle(imports: ImportDefinition[], onWarn?: (warn: string
 }
 
 function entryPlugin(opts: { id: string; code: string }): Plugin {
-  const resolvedId = resolved(opts.id);
+  const resolvedId = `\0${opts.id}`;
   const idRegex = new RegExp(`^${opts.id.replace(".", "\\.")}$`);
   const resolvedIdRegex = new RegExp(`^${resolvedId.replace(".", "\\.")}$`);
   return {
@@ -75,62 +62,6 @@ function entryPlugin(opts: { id: string; code: string }): Plugin {
       },
     },
   };
-}
-
-function npmModulePlugin(): Plugin {
-  return {
-    name: "npm-module",
-    resolveId(id, importer) {
-      console.log("Resolving ID:", { id, importer });
-      if (isHttpProtocol(id)) {
-        return resolved(id);
-      }
-      importer = importer ? unresolved(importer) : undefined;
-      if (importer && isHttpProtocol(importer)) {
-        const url = new URL(importer);
-        const resolvedPath = id.startsWith("/") ? id : path.join(path.dirname(url.pathname), id);
-        return resolved(`${url.origin}${resolvedPath}`);
-      }
-      if (id.startsWith("npm:")) {
-        id = id.replace(/^npm:/, "");
-      } else if (id.startsWith("jsr:")) {
-        id = id.replace(/^jsr:/, "jsr/");
-      }
-      return resolved(`https://esm.sh/${id}`);
-    },
-    async load(resolvedId) {
-      const id = unresolved(resolvedId);
-      const cached = cache.get(id);
-      if (cached) return cached;
-
-      if (isHttpProtocol(id)) {
-        const url = setConditions(id, ["browser", "import", "default"]);
-        const code = await get(url);
-        if (code) cache.set(id, code);
-        return code;
-      }
-      return null;
-    },
-  };
-}
-
-function isHttpProtocol(id: string) {
-  return id.startsWith("https://");
-}
-
-function resolved(id: string) {
-  return `\0${id}`;
-}
-function unresolved(id: string) {
-  // oxlint-disable-next-line no-control-regex
-  return id.replace(/^\0/, "");
-}
-
-function setConditions(url: string, conditions: string[]) {
-  const u = new URL(url);
-  if (u.host !== "esm.sh") return url;
-  u.searchParams.set("conditions", conditions.join(","));
-  return u.toString();
 }
 
 function getGzip(code: Uint8Array<ArrayBuffer>): Promise<ArrayBuffer> {
@@ -155,29 +86,4 @@ function handleNames(importNames: string): string {
   if (!trimmed.endsWith("}")) return `{ default as ${trimmed} }`;
   // `import React, {useState} from "react";`
   return `{default as ${trimmed.replace("{", "")}`;
-}
-
-function createLRUCache<K, V>(limit: number) {
-  const map = new Map<K, V>();
-  return {
-    get(key: K): V | undefined {
-      const value = map.get(key);
-      if (value !== undefined) {
-        // Refresh the key
-        map.delete(key);
-        map.set(key, value);
-      }
-      return value;
-    },
-    set(key: K, value: V): void {
-      if (map.has(key)) {
-        map.delete(key);
-      } else if (map.size >= limit) {
-        // Remove the oldest entry
-        const oldestKey = map.keys().next().value;
-        if (oldestKey !== undefined) map.delete(oldestKey);
-      }
-      map.set(key, value);
-    },
-  };
 }
