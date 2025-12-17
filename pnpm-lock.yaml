@@ -6,6 +6,15 @@ settings:
 
 importers:
   .:
+    devDependencies:
+      oxfmt:
+        specifier: ^0.17.0
+        version: 0.17.0
+      oxlint:
+        specifier: ^1.32.0
+        version: 1.32.0
+
+  website:
     dependencies:
       "@preact/signals":
         specifier: ^2.5.1
@@ -35,12 +44,6 @@ importers:
       "@types/node":
         specifier: ^24.10.1
         version: 24.10.3
-      oxfmt:
-        specifier: ^0.17.0
-        version: 0.17.0
-      oxlint:
-        specifier: ^1.32.0
-        version: 1.32.0
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
