@@ -12,6 +12,7 @@ const get = (url: string) => {
   cache.set(url, res);
   return res;
 };
+const mainFields = ["browser", "module", "jsnext:main", "jsnext", "main"];
 
 export const modulePlugin = npmModulePlugin();
 export const httpsPlugin = httpsModulePlugin();
@@ -48,7 +49,8 @@ function npmModulePlugin(): Plugin {
       const [, moduleName, modulePath] = parseNpmModuleId(id);
       const moduleMeta = await resolveNpmModuleMeta(moduleName);
       if (!moduleMeta) return;
-      const resolvedPath = r.exports(moduleMeta, modulePath, { browser: true })?.[0];
+      const resolvedPath =
+        r.exports(moduleMeta, modulePath, { browser: true })?.[0] || resolveMainFields(moduleMeta);
       if (!resolvedPath) return;
       const url = new URL(resolvedPath, `https://esm.sh/${moduleName}/`);
       return url.toString();
@@ -130,6 +132,15 @@ async function resolveNpmModuleMeta(moduleName: string): Promise<r.Package | und
       return JSON.parse(content);
     } catch {
       // noop
+    }
+  }
+}
+
+function resolveMainFields(pkg: r.Package): string | undefined {
+  for (const field of mainFields) {
+    const value = pkg[field];
+    if (typeof value === "string") {
+      return value.startsWith(".") ? value : `./${value}`;
     }
   }
 }
