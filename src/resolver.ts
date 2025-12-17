@@ -37,7 +37,7 @@ function npmModulePlugin(): Plugin {
         const [, moduleName, modulePath] = parseJsrModuleId(id);
         const moduleMeta = await resolveJsrModuleMeta(moduleName);
         if (!moduleMeta) return;
-        const resolvedPath = r.exports(moduleMeta, modulePath, { browser: true })?.[0];
+        const resolvedPath = r.resolve(moduleMeta, modulePath, { browser: true })?.[0];
         if (!resolvedPath) return;
         const url = new URL(resolvedPath, `https://esm.sh/jsr/${moduleName}/`);
         return url.toString();
@@ -48,7 +48,7 @@ function npmModulePlugin(): Plugin {
       const [, moduleName, modulePath] = parseNpmModuleId(id);
       const moduleMeta = await resolveNpmModuleMeta(moduleName);
       if (!moduleMeta) return;
-      const resolvedPath = r.exports(moduleMeta, modulePath, { browser: true })?.[0];
+      const resolvedPath = r.resolve(moduleMeta, modulePath, { browser: true })?.[0];
       if (!resolvedPath) return;
       const url = new URL(resolvedPath, `https://esm.sh/${moduleName}/`);
       return url.toString();
