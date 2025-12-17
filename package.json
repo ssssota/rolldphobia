@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "build": "pnpm -r build",
     "fmt": "oxfmt && oxlint --fix",
     "lint": "oxfmt --check && oxlint"
   },
