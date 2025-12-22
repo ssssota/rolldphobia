@@ -1,11 +1,11 @@
-import type { build as buildType, Plugin } from "@rolldown/browser";
+import type { Plugin, RolldownOutput, rolldown as rolldownType } from "@rolldown/browser";
 // HACK: Importing from dist to avoid wasm url issues in the browser
 // @ts-expect-error
-import { build as buildImpl } from "../node_modules/@rolldown/browser/dist/index.browser.mjs";
+import { rolldown as rolldownImpl } from "../node_modules/@rolldown/browser/dist/index.browser.mjs";
 import type { ImportDefinition } from "./import-definition";
 import { httpsPlugin, modulePlugin } from "./resolver";
 
-const build: typeof buildType = buildImpl;
+const rolldown: typeof rolldownType = rolldownImpl;
 
 const encoder = new TextEncoder();
 
@@ -13,33 +13,42 @@ export async function bundle(imports: ImportDefinition[], onWarn?: (warn: string
   try {
     const code = createCode(imports);
     const entry = `virtual:entry`;
-    const result = await build({
+    const bundle = await rolldown({
       treeshake: true,
       input: entry,
-      write: false,
       cwd: "/",
       onLog(level, log, logger) {
         if (level !== "warn") return logger(level, log);
         onWarn?.(String(log));
       },
-      output: { minify: true },
       plugins: [entryPlugin({ id: entry, code }), modulePlugin, httpsPlugin],
     });
-    const chunks = result.output.filter((c) => c.type === "chunk");
-    return await Promise.all(
-      chunks.map((c) => {
-        const utf8 = encoder.encode(c.code);
-        return getGzip(utf8).then((gzipBuffer) => ({
-          code: c.code,
-          size: utf8.byteLength,
-          gzip: gzipBuffer.byteLength,
-        }));
-      }),
-    );
+    const [bundled, minified] = await Promise.all([
+      bundle.generate({ minify: false }),
+      bundle.generate({ minify: true }),
+    ]);
+
+    const bundledCode = convertChunksToArrayBuffer(bundled);
+    const minifiedCode = convertChunksToArrayBuffer(minified);
+
+    const bundledSize = calculateTotalByteLength(bundledCode);
+    const minifiedSize = calculateTotalByteLength(minifiedCode);
+
+    const gzip = await Promise.all(minifiedCode.map(getGzip));
+    const gzipSize = calculateTotalByteLength(gzip);
+
+    return {
+      code: minified.output
+        .filter((o) => o.type === "chunk")
+        .map((o) => o.code)
+        .join("\n"),
+      bundled: bundledSize,
+      minified: minifiedSize,
+      gzip: gzipSize,
+    };
   } catch (e) {
     console.error("Bundling error:", e);
     onWarn?.(String(e));
-    return [];
   }
 }
 
@@ -64,9 +73,17 @@ function entryPlugin(opts: { id: string; code: string }): Plugin {
   };
 }
 
-function getGzip(code: Uint8Array<ArrayBuffer>): Promise<ArrayBuffer> {
+function convertChunksToArrayBuffer({ output }: RolldownOutput): ArrayBuffer[] {
+  return output.filter((o) => o.type === "chunk").map((o) => encoder.encode(o.code).buffer);
+}
+
+function calculateTotalByteLength(arrays: ArrayBuffer[]): number {
+  return arrays.reduce((sum, buf) => sum + buf.byteLength, 0);
+}
+
+function getGzip(code: ArrayBuffer): Promise<ArrayBuffer> {
   const cs = new CompressionStream("gzip");
-  const stream = new Response(code.buffer).body!.pipeThrough(cs);
+  const stream = new Response(code).body!.pipeThrough(cs);
   return new Response(stream).arrayBuffer();
 }
 

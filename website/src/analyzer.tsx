@@ -6,7 +6,8 @@ const slowWarningMessage = "[PLUGIN_TIMINGS]";
 
 type Result = {
   code: string;
-  size: number;
+  bundled: number;
+  minified: number;
   gzip: number;
 };
 
@@ -17,7 +18,7 @@ interface Props {
 export function Analyzer(props: Props) {
   const next = useRef<() => Promise<void>>();
   const warns = useSignal<string[]>([]);
-  const results = useSignal<Result[]>([]);
+  const result = useSignal<Result>();
   const bundleDuration = useSignal<number | null>(null);
   const isLoading = useSignal<boolean>(false);
   useSignalEffect(() => {
@@ -37,8 +38,8 @@ export function Analyzer(props: Props) {
           warns.value = [...warns.value, warn];
         }),
       )
-      .then((resultList) => {
-        results.value = resultList;
+      .then((res) => {
+        result.value = res;
         next.current?.();
       })
       .finally(() => {
@@ -65,36 +66,37 @@ export function Analyzer(props: Props) {
           ></div>
           <p class="mt-4 text-gray-600">Analyzing bundle...</p>
         </div>
-      ) : results.value.length > 0 ? (
-        <ul class="space-y-4">
-          {results.value.map((result) => (
-            <li key={result.code} class="p-4 bg-gray-50 border border-gray-300 rounded-md">
-              <dl class="flex flex-wrap gap-3 mb-3">
-                <div class="flex-1 min-w-32 p-3 bg-white border border-gray-300 rounded text-center">
-                  <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                    Bundle Size
-                  </dt>
-                  <dd class="text-xl font-bold text-gray-800">{byteLengthToString(result.size)}</dd>
-                </div>
-                <div class="flex-1 min-w-32 p-3 bg-white border border-gray-300 rounded text-center">
-                  <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
-                    Gzipped
-                  </dt>
-                  <dd class="text-xl font-bold text-gray-800">{byteLengthToString(result.gzip)}</dd>
-                </div>
-              </dl>
-              <details class="mt-3">
-                <summary class="px-3 py-2 flex items-center justify-between bg-gray-100 border border-gray-300 rounded cursor-pointer font-semibold text-xs text-gray-600 transition-all list-none hover:bg-gray-200 [&::-webkit-details-marker]:hidden">
-                  <span>View Generated Code</span>
-                  <span class="text-gray-400 text-sm">▼</span>
-                </summary>
-                <pre class="m-0 p-4 bg-gray-50 border border-gray-300 border-t-0 rounded-b overflow-x-auto whitespace-pre-wrap break-words">
-                  <code class="font-mono text-sm leading-relaxed text-gray-700">{result.code}</code>
-                </pre>
-              </details>
-            </li>
-          ))}
-        </ul>
+      ) : result.value ? (
+        <div key={result.value.code} class="p-4 bg-gray-50 border border-gray-300 rounded-md">
+          <dl class="flex flex-wrap gap-3 mb-3">
+            {[
+              { title: "Bundle Size", value: byteLengthToString(result.value.bundled) },
+              { title: "Minified Size", value: byteLengthToString(result.value.minified) },
+              { title: "Gzipped Size", value: byteLengthToString(result.value.gzip) },
+            ].map(({ title, value }) => (
+              <div
+                key={title}
+                class="flex-1 min-w-32 p-3 bg-white border border-gray-300 rounded text-center"
+              >
+                <dt class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                  {title}
+                </dt>
+                <dd class="text-xl font-bold text-gray-800">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <details class="mt-3">
+            <summary class="px-3 py-2 flex items-center justify-between bg-gray-100 border border-gray-300 rounded cursor-pointer font-semibold text-xs text-gray-600 transition-all list-none hover:bg-gray-200 [&::-webkit-details-marker]:hidden">
+              <span>View Minified Code</span>
+              <span class="text-gray-400 text-sm">▼</span>
+            </summary>
+            <pre class="m-0 p-4 bg-gray-50 border border-gray-300 border-t-0 rounded-b overflow-x-auto whitespace-pre-wrap break-words">
+              <code class="font-mono text-sm leading-relaxed text-gray-700">
+                {result.value.code}
+              </code>
+            </pre>
+          </details>
+        </div>
       ) : (
         <div class="text-center py-8 text-gray-400">
           <p class="text-base">Add import statements to analyze bundle size</p>
