@@ -34,7 +34,17 @@ export function Imports(props: Props) {
 
   return (
     <section class="bg-white rounded-lg shadow-sm p-4 md:p-5 border-2 border-gray-200">
-      <h2 class="text-xl font-bold mt-0 mb-4 text-gray-800">Import Statements</h2>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold m-0 text-gray-800">Import Statements</h2>
+        <button
+          onClick={() => {
+            temporary.value = [];
+          }}
+          class="text-sm text-gray-500 hover:text-red-600 hover:underline cursor-pointer bg-transparent border-none p-0 transition-colors"
+        >
+          Clear all
+        </button>
+      </div>
       <ul class="flex flex-col gap-3">
         {temporary.value.map((imp) => (
           <li
