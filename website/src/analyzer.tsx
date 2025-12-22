@@ -115,8 +115,8 @@ export function Analyzer(props: Props) {
 }
 
 function byteLengthToString(byteLength: number): string {
-  const kb = 2 << 10;
-  const mb = 2 << 20;
+  const kb = 1 << 10;
+  const mb = 1 << 20;
   if (byteLength < kb) return `${byteLength} B`;
   if (byteLength < mb) return `${(byteLength / kb).toFixed(2)} KiB`;
   return `${(byteLength / mb).toFixed(2)} MiB`;
