@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function Analyzer(props: Props) {
-  const next = useRef<() => Promise<void>>();
+  const next = useRef<() => Promise<void> | null>(null);
   const warns = useSignal<string[]>([]);
   const result = useSignal<Result>();
   const bundleDuration = useSignal<number | null>(null);

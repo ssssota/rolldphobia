@@ -11,7 +11,4 @@ export default defineConfig({
       "Cross-Origin-Opener-Policy": "same-origin",
     },
   },
-  experimental: {
-    enableNativePlugin: "resolver",
-  },
 });

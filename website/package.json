@@ -1,7 +1,7 @@
 {
   "name": "rolldphobia",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,22 +9,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@preact/signals": "^2.5.1",
-    "@rolldown/browser": "1.0.0-beta.54",
-    "@std/path": "jsr:^1.1.3",
-    "ansis": "^4.2.0",
+    "@preact/signals": "^2.11.1",
+    "@rolldown/browser": "1.2.6",
+    "@std/path": "jsr:^1.1.6",
+    "ansis": "^4.3.1",
     "jsonc-parser": "^3.3.1",
-    "preact": "^10.27.2",
+    "preact": "^10.29.8",
     "resolve.exports": "^2.0.3"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.10.2",
-    "@types/node": "^24.10.1",
-    "typescript": "~5.9.3",
-    "unocss": "^66.5.10",
-    "vite": "npm:vite@^8.0.0-beta.1"
-  },
-  "overrides": {
-    "vite": "npm:vite@^8.0.0-beta.1"
+    "@preact/preset-vite": "^2.10.6",
+    "@types/node": "^26.4.0",
+    "typescript": "~7.0.2",
+    "unocss": "^66.8.1",
+    "vite": "^8.2.2"
   }
 }
